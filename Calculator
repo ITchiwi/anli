@@ -1,0 +1,81 @@
+/**
+ * 
+计算器类（Calculator），可以实现两个数的加、减、乘、除运算，并可以进行undo和redo操作
+undo：即为撤销，撤销上一步的操作，返回上一步的结果
+redo：即为重做，在撤销之后，可以重做上一步的操作，没有撤销的话，仍是返回最新结果
+ */
+class Calculator {
+    private double result;
+    private Stack<Double> undoStack;
+    private Stack<Double> redoStack;
+
+    public Calculator() {
+        result = 0;
+        undoStack = new Stack<>();
+        redoStack = new Stack<>();
+    }
+
+    public double add(double num) {
+        operation(result + num);
+        return result;
+    }
+
+    public double subtract(double num) {
+        operation(result - num);
+        return result;
+    }
+
+    public double multiply(double num) {
+        operation(result * num);
+        return result;
+    }
+
+    public double divide(double num) {
+        if (num == 0) {
+            throw new IllegalArgumentException("除数不允许为0");
+        }
+        operation(result / num);
+        return result;
+    }
+
+    private void operation(double newResult) {
+        undoStack.push(result);
+        result = newResult;
+        redoStack.clear();
+    }
+
+    public double undo() {
+        if (!undoStack.isEmpty()) {
+            redoStack.push(result);
+            result = undoStack.pop();
+            return result;
+        }
+        return result;
+    }
+
+    public double redo() {
+        if (!redoStack.isEmpty()) {
+            undoStack.push(result);
+            result = redoStack.pop();
+            return result;
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        Calculator calculator = new Calculator();
+        calculator.add(10);
+        calculator.multiply(5);
+        System.out.println("当前结果: " + calculator.result);
+        calculator.undo();
+        System.out.println("撤销结果: " + calculator.result);
+        calculator.redo();
+        System.out.println("重做结果: " + calculator.result);
+        calculator.subtract(10);
+        System.out.println("当前结果: " + calculator.result);
+        calculator.redo();
+        System.out.println("重做结果: " + calculator.result);
+
+        calculator.divide(0);
+    }
+}
